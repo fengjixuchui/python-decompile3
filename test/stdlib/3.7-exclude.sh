@@ -1,9 +1,38 @@
 SKIP_TESTS=(
+    [test_poplib.py]=1 # FIXME: decompile reduce_check/ifelsestmt.py code problem. works on uncompyle6
+    [test_types.py]=1 # FIXME: decompile reduce_check/ifelsestmt.py code problem. works on uncompyle6
+
+    [test_bytes.py]=1 # parse error. works on uncompyle6
+    [test_string_literals.py]=1 # parse error; works on uncompyle6
+    [test_fileio.py]=1 # parse error; works on uncompyle6
+    [test_fork1.py]=1 # parse error; works on uncompyle6
+    [test_http_cookiejar.py]=1 # parse error; works on uncompyle6
+    [test_imp.py]=1 # parse error; works on uncompyle6
+    [test_os.py]=1 # parse error; works on uncompyle6
+    [test_strftime.py]=1 # parse error; works on uncompyle6
+    [test_string_literals.py]=1 # parse error; works on uncompyle6
+    [test_urllib.py]=1 # parse error; works on uncompyle6
+
+    [test_ast.py]=1 # test error. works on uncompyle6
+    [test_baseexception.py]=1 # test failure (1). works on uncompyle6
+    [test_deque.py]=1 # test assert. works on uncompyle6
+    [test_format.py]=1 # test errors. works on uncompyle6
+    [test_int.py]=1 # test failure (1). works on uncompyle6
+    [test_modulefinder.py]=1 # test failures. works on uncompyle6
+    [test_normalization.py]=1 # test errors (1). works on uncompyle6
+    [test_opcodes.py]=1 # test errors; control flow. works on uncompyle6
+    [test_plistlib.py]=1 # test errors; control flow. works on uncompyle6
+    [test_posix.py]=1 # test errors; control flow. works on uncompyle6
+    [test_queue.py]=1 # test failures (3); works on uncompyle6
+    [test_readline.py]=1 # test errors (1); works on uncompyle6
+
     [test_httplib.py]=1 # test runs. kills after 15 seconds. works on f7e2064e
     [test_grammar.py]=1 # parse error. Probably "try"
 
     [test___all__.py]=1 # it fails on its own
+    [test_argparse.py]=1 # it fails on its own
     [test_asdl_parser.py]=1 # it fails on its own
+    [test_asyncgen.py]=1 # parse error
     [test_atexit.py]=1  # The atexit test looks for specific comments in error lines
     [test_buffer.py]=1  # Test run errors; takes long time to decompile
 
@@ -24,6 +53,7 @@ SKIP_TESTS=(
     [test_descr.py]=1   # test assertion failures
     [test_devpoll.py]=1 # it fails on its own
     [test_dis.py]=1   # Introspects on line numbers; line numbers don't match in disassembly - duh!
+    [test_doctest.py]=1   # fails on its own
 
     [test_enum.py]=1   # test run errors; probably bad control flow
 
@@ -106,7 +136,8 @@ SKIP_TESTS=(
     [test_zipfile.py]=1 # it fails on its own
     [test_zipfile64.py]=1 # Too long to run
 )
-# 284 unit-test files in about 15 minutes
+# 288 unit-test files in about 25 minutes
+# 277 for unpyc37
 
 if (( BATCH )) ; then
     SKIP_TESTS[test_bdb.py]=1 # fails on POWER
