@@ -477,11 +477,13 @@ class Python37Parser(Python37LambdaParser):
         """
         stmt     ::= async_for_stmt37
         stmt     ::= async_for_stmt
+        stmt     ::= async_for_stmt2
         stmt     ::= async_forelse_stmt
 
         # FIXME: DRY this with rules.
         async_for_stmt     ::= setup_loop expr
                                GET_AITER
+                               _come_froms
                                SETUP_EXCEPT GET_ANEXT LOAD_CONST
                                YIELD_FROM
                                store
@@ -493,8 +495,9 @@ class Python37Parser(Python37LambdaParser):
                                POP_TOP POP_TOP POP_TOP POP_EXCEPT POP_TOP POP_BLOCK
                                opt_come_from_loop
 
-        async_for_stmt     ::= setup_loop expr
+        async_for_stmt2    ::= setup_loop expr
                                GET_AITER
+                               _come_froms
                                LOAD_CONST YIELD_FROM SETUP_EXCEPT GET_ANEXT LOAD_CONST
                                YIELD_FROM
                                store
@@ -508,18 +511,21 @@ class Python37Parser(Python37LambdaParser):
         # Order of LOAD_CONST YIELD_FROM is switched from 3.6 to save a LOAD_CONST
         async_for_stmt37   ::= setup_loop expr
                                GET_AITER
+                               _come_froms
                                SETUP_EXCEPT GET_ANEXT
                                LOAD_CONST YIELD_FROM
                                store
                                POP_BLOCK JUMP_BACK COME_FROM_EXCEPT DUP_TOP
                                LOAD_GLOBAL COMPARE_OP POP_JUMP_IF_TRUE
-                               END_FINALLY for_block COME_FROM
+                               END_FINALLY
+                               for_block COME_FROM
                                POP_TOP POP_TOP POP_TOP POP_EXCEPT
                                POP_TOP POP_BLOCK
                                COME_FROM_LOOP
 
         async_forelse_stmt ::= setup_loop expr
                                GET_AITER
+                               _come_froms
                                SETUP_EXCEPT GET_ANEXT LOAD_CONST
                                YIELD_FROM
                                store
@@ -612,6 +618,7 @@ class Python37Parser(Python37LambdaParser):
         testtruec  ::= expr POP_JUMP_IF_FALSE_BACK
         # Do we have to check the c_compare_chained37 ends in a POP_JUMP_IF_FALSE_BACK?
         testtruec  ::= c_compare_chained37_false
+        testtruec  ::= c_compare_chained37
         testtruec  ::= c_nand
 
         testtrue   ::= compare_chained37
