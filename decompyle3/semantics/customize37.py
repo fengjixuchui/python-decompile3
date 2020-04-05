@@ -188,9 +188,9 @@ def customize_for_version37(self, version):
                         (1, "ifstmts_jumpc")
             ),
             "if_and_elsestmtc": ("%|if %c and %c:\n%+%c%-%|else:\n%+%c%-",
-                               (0, "expr"),
-                               (2, "expr"),
-                               (4, "c_stmts"),
+                               (0, "expr_pjif"),
+                               (1, "expr_pjif"),
+                               (2, "c_stmts"),
                                (-2, "else_suitec")),
             "if_and_stmt": ("%|if %c and %c:\n%+%c%-",
                            (0, "expr_pjif"), (1, "expr"),
@@ -425,10 +425,16 @@ def customize_for_version37(self, version):
     self.n_c_with = n_c_with
 
     def n_c_except_suite(node):
-        if len(node) == 1 and node[0] == "except_suite":
+        node_len = len(node)
+        if not (node_len == 1 and node[0] in ("except_suite", "c_returns")):
+            try:
+                node[1]
+            except:
+                from trepan.api import debug; debug()
+        if node_len == 1 and node[0] in ("except_suite", "c_returns"):
             node = node[0]
             self.default(node)
-        elif node[1] == "c_suite_stmts":
+        elif node[1] in ("c_suite_stmts", "c_except_suite"):
             node = node[1][0]
             template = ("%+%c%-", 0)
             self.template_engine(template, node)
