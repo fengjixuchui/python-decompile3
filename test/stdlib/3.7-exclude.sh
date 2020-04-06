@@ -1,11 +1,8 @@
 SKIP_TESTS=(
-    [test_ast.py]=1 # test error. works on uncompyle6
     [test_deque.py]=1 # test assert. works on uncompyle6
     [test_modulefinder.py]=1 # test failures. works on uncompyle6
     [test_plistlib.py]=1 # test errors; control flow. works on uncompyle6
-    [test_posix.py]=1 # test errors; control flow. works on uncompyle6
     [test_socketserver.py]=1 # test times out; works on uncompyle6
-    [test_types.py]=1 # test failure (1) works on uncompyle6
     [test_venv.py]=1 # test error (1) works on uncompyle6
     [test_wsgiref.py]=1 # test error (1) works on uncompyle6
 
@@ -90,6 +87,7 @@ SKIP_TESTS=(
     [test_smtplib.py]=1 # test errors
     [test_socket.py]=1 # Takes too long to run before decompiling
     [test_ssl.py]=1 # Takes too long to run more than 15 seconds. Probably control flow; unintialized variable
+    [test_statistics.py]=1 # test errors
     [test_startfile.py]=1 # it fails on its own
     [test_strptime.py]=1 # test check failure
     [test_strtod.py]=1 # test assertions failed
@@ -105,10 +103,11 @@ SKIP_TESTS=(
     [test_traceback.py]=1 # Probably uses comment for testing
     [test_tracemalloc.py]=1 # test assert failures
     [test_ttk_guionly.py]=1  # implementation specfic and test takes too long to run: 19 seconds
+    [test_types.py]=1 # test failure
     [test_typing.py]=1 # run errors
 
     [test_unicode.py]=1 # unicode thing
-    [test_urllibnet.py]=1 # test erors
+    [test_urllibnet.py]=1 # test errors
 
     [test_weakref.py]=1 # takes too long to run
     [test_with.py]=1 # test errors.
@@ -120,7 +119,7 @@ SKIP_TESTS=(
     [test_zipfile.py]=1 # it fails on its own
     [test_zipfile64.py]=1 # Too long to run
 )
-# 304 unit-test files in about 19 minutes
+# 305 unit-test files in about 19 minutes
 # 277 for unpyc37
 
 if (( BATCH )) ; then
