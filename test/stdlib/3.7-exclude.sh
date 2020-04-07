@@ -1,10 +1,8 @@
 SKIP_TESTS=(
-    [test_deque.py]=1 # test assert. works on uncompyle6
     [test_modulefinder.py]=1 # test failures. works on uncompyle6
     [test_plistlib.py]=1 # test errors; control flow. works on uncompyle6
     [test_socketserver.py]=1 # test times out; works on uncompyle6
     [test_venv.py]=1 # test error (1) works on uncompyle6
-    [test_wsgiref.py]=1 # test error (1) works on uncompyle6
 
     [test_httplib.py]=1 # test runs. kills after 15 seconds. works on f7e2064e
     [test_grammar.py]=1 # parse error. Probably "try"
@@ -135,5 +133,18 @@ if (( BATCH )) ; then
     SKIP_TESTS[test_ttk_textonly.py]=1 # Installation dependent?
     SKIP_TESTS[test_venv.py]=1 # Too long to run: 11 seconds
     SKIP_TESTS[test_zipimport_support.py]=1
-
+    # POWER8 Debian problems
+    SKIP_TESTS[test_codecmaps_cn.py]=1 # test takes too long to run: 136 seconds
+    SKIP_TESTS[test_codecmaps_hk.py]=1 # test takes too long to run: 45 seconds
+    SKIP_TESTS[test_codecmaps_jp.py]=1 # test takes too long to run: 226 seconds
+    SKIP_TESTS[test_codecmaps_kr.py]=1 # test takes too long to run: 135 seconds
+    SKIP_TESTS[test_codecmaps_tw.py]=1 # test takes too long to run: 91 seconds
+    SKIP_TESTS[test_hashlib.py]=1 # test takes too long to run: 122 seconds
+    SKIP_TESTS[test_multiprocessing_main_handling.py]=1 # test takes too long to run: 11 seconds
+    SKIP_TESTS[test_pickle.py]=1 # test takes too long to run: 14 seconds
+    SKIP_TESTS[test_robotparser.py]=1 # test takes too long to run: 31 seconds
+    SKIP_TESTS[test_ucn.py]=1 # test takes too long to run: 16 seconds
+    SKIP_TESTS[test_urllib2net.py]=1 # test hangs
+    SKIP_TESTS[test_urllib2_localnet.py]=1 # hangs on POWER8
+    SKIP_TESTS[test_zipimport.py]=1 # test run error on POWER8
 fi
