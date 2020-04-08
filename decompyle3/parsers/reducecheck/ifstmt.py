@@ -13,18 +13,19 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+#  Example A: an example where we have weird COME_FROMs
+#
+#   if a:
+#     if b:   # false jumps around outer else
+#       raise
+#   elif c:
+#      a = 2
+#   #end is jump to by "if not b" above
+
 
 def ifstmt(
     self, lhs: str, n: int, rule, ast, tokens: list, first: int, last: int
 ) -> bool:
-    # if lhs == "ifstmtc":
-    #     if last == n:
-    #         last -= 1
-    #         pass
-    #     if tokens[last].attr and isinstance(tokens[last].attr, int):
-    #         if tokens[first].offset >= tokens[last].attr:
-    #             return True
-    #     pass
 
     # print("XXX", first, last, rule)
     # for t in range(first, last):
@@ -34,31 +35,11 @@ def ifstmt(
     ltm1 = tokens[last - 1]
     first_offset = tokens[first].off2int(prefer_last=False)
 
-    # Test that the outermost COME_FROM, if it exists, must be *somewhere*
-    # in the range of the if stmt.
-    if ltm1 == "COME_FROM" and ltm1.attr < first_offset:
-        return True
-
-    # Make sure jumps don't extend beyond the end of the if statement.
-    last_offset = tokens[last].off2int()
-    for i in range(first, last):
-        t = tokens[i]
-        # instead of POP_JUMP_IF, should we use op attributes?
-        if t.kind.startswith("POP_JUMP_IF_"):
-            pjif_target = t.attr
-            if pjif_target > last_offset:
-                # In some cases, where we have long bytecode, a
-                # "POP_JUMP_IF_TRUE/FALSE" offset might be too
-                # large for the instruction; so instead it
-                # jumps to a JUMP_FORWARD. Allow that here.
-                if tokens[last] == "JUMP_FORWARD":
-                    return tokens[last].attr != pjif_target
-                return True
-            # elif lhs == "ifstmtc" and tokens[first].off2int() > pjif_target:
-            #     # A conditional JUMP to the loop is expected for "ifstmtc"
-            #     return True
-            pass
-        pass
+    # The below doesn't work for Example A above
+    # # Test that the outermost COME_FROM, if it exists, must be *somewhere*
+    # # in the range of the if stmt.
+    # if ltm1 == "COME_FROM" and ltm1.attr < first_offset:
+    #     return True
 
     if not ast:
         return False
@@ -69,9 +50,9 @@ def ifstmt(
     if test in ("testexpr", "testexprc"):
         test = test[0]
 
+    pop_jump_if = None
     if test in ("testtrue", "testtruec", "testfalse"):
 
-        pop_jump_if = None
         if len(test) == 1 and test[0].kind.startswith("expr_pji"):
             pop_jump_if = test[0][1]
         elif len(test) > 1 and test[1].kind.startswith("POP_JUMP_IF_"):
@@ -88,22 +69,25 @@ def ifstmt(
                 endif_offset = tokens[last - 2].off2int(prefer_last=True)
 
             if first_offset <= jump_target < endif_offset:
+                if rule[1] == ("testexpr", "stmts", "come_froms"):
+                    come_froms = ast[2]
+
+                    if hasattr(come_froms, "first_child"):
+                        come_from_offset = come_froms.first_child()
+                    else:
+                        assert come_froms.kind.startswith("COME_FROM")
+                        come_from_offset = come_froms.off2int()
+                    return jump_target != come_from_offset
                 # FIXME: investigate why this happens for "if"s with EXTENDED_ARG POP_JUMP_IF_FALSE.
                 # An example is decompyle3/semantics/transform.py n_ifelsestmt.py
-                if not (
-                    jump_target != endif_offset
-                    or rule == ("ifstmt", ("testexpr", "stmts", "come_froms"))
-                ):
+                elif rule[1][-1] == "\\e__come_froms":
                     return True
+                pass
 
             # jump_target equal tokens[last] is also okay: normal non-optimized non-loop jump
             # HACK Alert: +2 refers to instruction offset after endif
             if jump_target > endif_offset + 2:
-                # One more weird case to look out for
-                #   if c1:
-                #      if c2:  # Jumps around the *outer* "else"
-                #       ...
-                #   else:
+                # test for Example A where "if b" jumps around the outer "else"
                 if jump_target == tokens[last - 1].attr:
                     return False
                 if last < n and tokens[last].kind.startswith("JUMP"):
@@ -127,7 +111,39 @@ def ifstmt(
                 # Make sure pop_jump_if doesn't jump inside the "then" part of the "if"
                 # print("WOOT", pop_jump_if.attr - endif_offset)
                 # We leave some slop for endif_offset being one instruction behind.
+
                 return not ((pop_jump_if.attr - endif_offset) in (0, 2))
+        pass
+
+    # If there is a final COME_FROM and that test jumps to that, this is a strong
+    # indication that this is ok, s we'll skip jumps jumping too far test.
+    if pop_jump_if is not None and ltm1 == "COME_FROM" and ltm1.attr == pop_jump_if.off2int():
+        return False
+
+    # Make sure jumps don't extend beyond the end of the if statement.
+    # This is done after the weird stuff above. There is a problem with the
+    # below is that it suffers from example A the "if b" jumping around
+    # the outer else. So we do this after all of the above and
+    # rely on the above COME_FROM test.
+
+    last_offset = tokens[last].off2int()
+    for i in range(first, last):
+        t = tokens[i]
+        # instead of POP_JUMP_IF, should we use op attributes?
+        if t.kind.startswith("POP_JUMP_IF_"):
+            pjif_target = t.attr
+            if pjif_target > last_offset:
+                # In some cases, where we have long bytecode, a
+                # "POP_JUMP_IF_TRUE/FALSE" offset might be too
+                # large for the instruction; so instead it
+                # jumps to a JUMP_FORWARD. Allow that here.
+                if tokens[last] == "JUMP_FORWARD":
+                    return tokens[last].attr != pjif_target
+                return True
+            # elif lhs == "ifstmtc" and tokens[first].off2int() > pjif_target:
+            #     # A conditional JUMP to the loop is expected for "ifstmtc"
+            #     return True
+            pass
         pass
 
     return False

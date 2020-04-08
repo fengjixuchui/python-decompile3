@@ -115,6 +115,7 @@ class Python37Parser(Python37LambdaParser):
         stmts_opt ::= pass
 
         stmts  ::= stmt+
+        stmts  ::= stmts last_stmt
         _stmts ::= stmts
 
         suite_stmts ::= _stmts
@@ -539,8 +540,7 @@ class Python37Parser(Python37LambdaParser):
         """
 
     def p_grammar(self, args):
-        """
-        sstmt ::= stmt
+        """sstmt ::= stmt
         sstmt ::= ifelsestmtr
         sstmt ::= return RETURN_LAST
 
@@ -609,7 +609,7 @@ class Python37Parser(Python37LambdaParser):
         testexpr   ::= testtrue
         testexpr   ::= or_and_not
 
-        testfalse  ::= expr POP_JUMP_IF_FALSE
+        testfalse  ::= expr_pjif
         testfalsec ::= expr POP_JUMP_IF_TRUE_BACK
         testfalsec ::= c_compare_chained1b_false_37
 
@@ -637,8 +637,10 @@ class Python37Parser(Python37LambdaParser):
         # Python 3.4+ optimizes the trailing two JUMPS away
         ifstmts_jump ::= stmts_opt JUMP_FORWARD JUMP_FORWARD _come_froms
 
-        iflaststmt  ::= testexpr returns
+        # For "iflaststmt" there is a rule check for the below that the end of
+        # "stmts" doesn't fall through.
         iflaststmt  ::= testexpr stmts
+        iflaststmt  ::= testexpr returns
         iflaststmt  ::= testexpr stmts JUMP_FORWARD
 
         iflaststmtc ::= testexpr c_stmts
@@ -656,8 +658,6 @@ class Python37Parser(Python37LambdaParser):
 
         ifelsestmt    ::= testexpr
                           stmts_opt jf_cfs else_suite_opt opt_come_from_except
-        ifelsestmt    ::= testexpr stmts_opt JUMP_FORWARD
-                          else_suite_opt opt_come_from_except
         ifelsestmt    ::= bool_op
                           stmts_opt jf_cfs else_suite_opt opt_come_from_except
 
@@ -866,7 +866,7 @@ class Python37Parser(Python37LambdaParser):
         ifelsestmtc        ::= testexpr c_stmts_opt JUMP_FORWARD else_suite _come_froms
 
         ifstmtc            ::= testexpr ifstmts_jumpc
-        ifstmtc            ::= testexprc ifstmts_jumpc
+        ifstmtc            ::= testexprc ifstmts_jumpc _come_froms
 
         ifstmts_jumpc             ::= ifstmts_jump
         ifstmts_jumpc             ::= c_stmts_opt come_froms

@@ -1,8 +1,12 @@
 SKIP_TESTS=(
-    [test_ast.py]=1 # works on 5bbb74f3 (HEAD~)
-    [test_platform.py]=1 # works on 5bbb74f3 (HEAD~)
+    [test_poplib.py]=1 # works on 5bbb74f3 (HEAD~10)
+    [test_threaded_import.py]=1 # works on 5bbb74f3 (HEAD~10)
+
+    [test_codecs.py]=1 # works on 5bbb74f3 (HEAD~)
+    [test_pyclbr.py]=1 # works on 5bbb74f3 (HEAD~)
+    [test_urllib2.py]=1 # works on 5bbb74f3 (HEAD~5)
+
     [test_socketserver.py]=1 # test times out; works on uncompyle6
-    [test_venv.py]=1 # test error (1) works on uncompyle6
 
     [test_httplib.py]=1 # test runs. kills after 15 seconds. works on f7e2064e
     [test_grammar.py]=1 # parse error. Probably "try"
@@ -10,7 +14,6 @@ SKIP_TESTS=(
     [test___all__.py]=1 # it fails on its own
     [test_argparse.py]=1 # it fails on its own
     [test_asdl_parser.py]=1 # it fails on its own
-    [test_asyncgen.py]=1 # parse error
     [test_atexit.py]=1  # The atexit test looks for specific comments in error lines
     [test_buffer.py]=1  # Test run errors; takes long time to decompile
 
@@ -37,7 +40,7 @@ SKIP_TESTS=(
 
     [test_faulthandler.py]=1   # test takes too long before decompiling
     [test_fileinput.py]=1 # too long to run - control flow?
-    [test_frame.py]=1 # test assertion errors
+    [test_frame.py]=1 # Introspects line number
     [test_fstring.py]=1 # need to disambiguate leading fstrings from docstrings
 
     [test_generators.py]=1  # Works if you run via Python. So possibly some test-framework problem
@@ -47,12 +50,12 @@ SKIP_TESTS=(
 
     [test_imaplib.py]=1 # test errors; control-flow?
     [test_io.py]=1 # test takes too long to run before decompilation: 37 seconds
-    [test_inspect.py]=1 # Investigate test check failures
+    [test_inspect.py]=1 # parse error
 
     [test_kqueue.py]=1 # it fails on its own
 
     [test_lib2to3.py]=1 # it fails on its own
-    [test_long.py]=1 # FIX: if boundaries wrong in Rat __init__
+    [test_long.py]=1 # test assert failure (1)
     [test_logging.py]=1 # test takes too long to run: 20 seconds
 
     [test_mailbox.py]=1 # probably control flow
@@ -68,7 +71,7 @@ SKIP_TESTS=(
     [test_optparse.py]=1 # test takes more than 15 seconds to run
 
     [test_pdb.py]=1 # Probably relies on comments
-    [test_peepholer.py]=1 # test assert error (1)
+    [test_peepholer.py]=1 # test assert error (2)
     [test_pkg.py]=1 # Investigate: lists differ
     [test_pkgutil.py]=1 # Investigate:
     [test_poll.py]=1 # Takes too long to run before decompiling 11 seconds
@@ -87,21 +90,21 @@ SKIP_TESTS=(
     [test_ssl.py]=1 # Takes too long to run more than 15 seconds. Probably control flow; unintialized variable
     [test_statistics.py]=1 # test error (1)
     [test_startfile.py]=1 # it fails on its own
-    [test_strptime.py]=1 # test check failure
+    [test_strptime.py]=1 # test check failure (1)
     [test_strtod.py]=1 # test assertions failed
     [test_subprocess.py]=1 # Takes too long to run before decompile: 25 seconds
     [test_sys_settrace.py]=1 # running the tests loops forever. Control flow?
 
     [test_tarfile.py]=1 # test takes too long to run before decompiling
     [test_telnetlib.py]=1 # test run takes more than 15 seconds
-    [test_threading.py]=1 # test assertion failures
+    [test_threading.py]=1 # test assertion failures (2+)
     [test_tk.py]=1  # test takes too long to run: 13 seconds
     [test_tokenize.py]=1 # test takes too long to run before decompilation: 43 seconds
     [test_trace.py]=1  # it fails on its own
     [test_traceback.py]=1 # Probably uses comment for testing
     [test_tracemalloc.py]=1 # test assert failures
     [test_ttk_guionly.py]=1  # implementation specfic and test takes too long to run: 19 seconds
-    [test_types.py]=1 # test failure
+    [test_types.py]=1 # test failure (1)
     [test_typing.py]=1 # run errors
 
     [test_unicode.py]=1 # unicode thing
