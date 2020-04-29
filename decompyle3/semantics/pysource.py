@@ -128,7 +128,7 @@ import sys
 
 IS_PYPY = "__pypy__" in sys.builtin_module_names
 
-from xdis.code import iscode
+from xdis import iscode
 from xdis.util import COMPILER_FLAG_BIT
 
 import decompyle3.parsers.main as python_parser
@@ -1878,7 +1878,7 @@ class SourceWalker(GenericASTTraversal, object):
             elif self.version >= 3.6 and k.startswith("CALL_FUNCTION_KW"):
                 TABLE_R[k] = ("%c(%P)", (0, "expr"), (1, -1, ", ", 100))
             elif op == "CALL_FUNCTION":
-                TABLE_R[k] = ("%c(%P)", (0, "expr"), (1, -1, ", ", 100))
+                TABLE_R[k] = ("%c(%P)", (0, "expr"), (1, -1, ", ", PRECEDENCE["yield"]-1))
             elif op in (
                 "CALL_FUNCTION_VAR",
                 "CALL_FUNCTION_VAR_KW",

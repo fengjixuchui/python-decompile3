@@ -3,10 +3,20 @@ SKIP_TESTS=(
     [test_builtin.py]=1 # too long to run test; works on uncompyle6
     [test_colorsys.py]=1 # too long to run test; works on uncompyle6
     [test_contextlib_async.py]=1 # FIXME: parse error works on uncompyle6?
+    [test_capi.py]=1 # works on uncompyle6 ?
+    [test_codeccallbacks.py]=1 # works on uncompyle6 ?
+
+    [test_dataclasses.py]=1 # works on uncompyle6 ?
+    [test_deque.py]=1 # works on uncompyle6 ?
+    [test_parser.py]=1 # works on uncompyle6 ?
+    [test_sysconfig.py]=1 # works on uncompyle6 ?
+    [test_thread.py]=1 # works on uncompyle6 ?
+
     [test_fileio.py]=1 # works on uncompyle6
     [test_fork1.py]=1 # works on uncompyle6
-    [test___future__.py]=1 # test failure; works on uncompyle6
+    [test_format.py]=1 # works on uncompyle6?
     [test_fractions.py]=1 # works on uncompyle6
+
     [test_heapq.py]=1 # works on uncompyle6
     [test_marshal.py]=1 # works on uncompyle6
     [test_pkgimport.py]=1 # works on uncompyle6
@@ -44,7 +54,6 @@ SKIP_TESTS=(
     [test_argparse.py]=1 #- it fails on its own
     [test_array.py]=1 #- parse error
     [test_asdl_parser.py]=1 # it fails on its own
-    [test_ast.py]=1  # Depends on comments in code
     [test_asyncgen.py]=1 # parse error
     [test_asyncore.py]=1 # test run takes more than 15 secs.
     [test_atexit.py]=1  # The atexit test looks for specific comments in error lines
@@ -52,7 +61,7 @@ SKIP_TESTS=(
 
     [test_baseexception.py]=1  # test errors; control flow probably
     [test_bigmem.py]=1  # parse error
-    [test_binop.py]=1  # test check failures
+    [test_binop.py]=1  # parse error
     [test_bdb.py]=1  # parse error
     [test_buffer.py]=1  # parse error; take a long time to decompile
     [test_bz2.py]=1  # parse error
@@ -60,14 +69,12 @@ SKIP_TESTS=(
     [test_cap.py]=1  # takes too long to run before decompiling - 15 seconds
     [test_cgi.py]=1  # parse error
     [test_clinic.py]=1 # it fails on its own
-    [test_cmath.py]=1 # test check failure
+    [test_cmath.py]=1 # parse error
     [test_cmd.py]=1  # parse error
     [test_cmd_line.py]=1  # Interactive?
     [test_cmd_line_script.py]=1 # test check failures
     [test_code_module.py]=1 # parse error
     [test_codecs.py]=1 # parse error
-    [test_codecmaps_cn.py]=1 # test before decompile takes too long to run 135 secs
-    [test_codecmaps_hk.py]=1 # test before decompile takes too long to run 46 secs
     [test_collections.py]=1 # parse error
     [test_compile.py]=1 # test check failures
     [test_compileall.py]=1 # fails on its own
@@ -99,10 +106,8 @@ SKIP_TESTS=(
     [test_exception_hierarchy.py]=1 # control flow?
     [test_exceptions.py]=1   # parse error
 
-    [test_faulthandler.py]=1   # takes too long
     [test_file_eintr.py]=1 # too long to run test; works on 3.7.7
     [test_fileinput.py]=1  # parse error
-    [test_float.py]=1  # Takes a long time to decompile
     [test_frame.py]=1 # Test failures
     [test_fstring.py]=1 # Investigate: Syntax error unexcpeted EOF wile parsing
     [test_ftplib.py]=1 # parse error
@@ -137,11 +142,8 @@ SKIP_TESTS=(
     [test_lzma.py]=1 # it fails on its own
 
     [test_mailbox.py]=1 # test failures
-    [test_mailcap.py]=1 # test failures
-    [test_math.py]=1 # test failures and errors; takes along time to run
-    [test_memoryio.py]=1 # test failure
+    [test_math.py]=1 # parser error; takes a long time to run
     [test_minidom.py]=1 # test failure
-    [test_mmap.py]=1 # test errors
     [test_modulefinder.py]=1 # test failures
     [test_msilib.py]=1 # fails on its own
     [test_multiprocessing_fork.py]=1 # test takes too long to run: 62 seconds
@@ -251,7 +253,7 @@ SKIP_TESTS=(
     [test_zipfile.py]=1 # it fails on its own
     [test_zipfile64.py]=1 #
 )
-# 210 test files, Elapsed time about 15 minutes 20 seconds
+# 210 test files, Elapsed time about 16
 
 if (( BATCH )) ; then
     SKIP_TESTS[test_idle.py]=1 # Probably installation specific

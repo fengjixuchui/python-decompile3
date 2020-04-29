@@ -29,7 +29,7 @@ Note however all of this is imported from the __init__ module
 
 import sys
 
-from xdis.code import iscode
+from xdis import iscode
 from xdis.magics import py_str2float
 from spark_parser import GenericASTBuilder, DEFAULT_DEBUG as PARSER_DEFAULT_DEBUG
 from decompyle3.show import maybe_show_asm
@@ -62,11 +62,13 @@ class PythonLambdaParser(GenericASTBuilder):
         # collect as stmts -> stmt stmt ...
         nt_list = [
             "_come_froms",
+            "and_parts",
             "attributes",
             "come_froms",
             "exprlist",
             "kvlist",
             "kwargs",
+            "or_parts",
         ]
         self.collect = frozenset(nt_list)
 
@@ -85,7 +87,7 @@ class PythonLambdaParser(GenericASTBuilder):
         )
 
         # Reduce singleton reductions in these nonterminals:
-        # FIXME: would love to do expr, sstmts, stmts and
+        # FIXME: would love to do sstmts, stmts and
         # so on but that would require major changes to the
         # semantic actions
         self.singleton = frozenset(("str", "store", "inplace_op"))
@@ -301,6 +303,7 @@ class PythonParser(PythonLambdaParser):
         nt_list = [
             "_come_froms",
             "_stmts",
+            "and_parts",
             "attributes",
             "come_froms",
             "except_stmts",
@@ -308,6 +311,7 @@ class PythonParser(PythonLambdaParser):
             "importlist",
             "kvlist",
             "kwargs",
+            "or_parts",
             # FIXME:
             # If we add c_stmts, we can miss adding a c_stmt,
             # test_float.py test_set_format() is an example.

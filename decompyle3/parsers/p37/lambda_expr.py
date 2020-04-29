@@ -74,9 +74,13 @@ class Python37LambdaParser(Python37BaseParser):
         # Note: "and" like "nor" might not have a trailing "come_from".
         #       "nand" and "or", in contrast, *must* have at least one "come_from".
         not_or     ::= and_parts expr_pjif _come_froms
-        and_cond   ::= and_parts expr_pjif _come_froms
 
-        and        ::= and_parts expr
+        and_cond   ::= and_parts expr_pjif _come_froms
+        and_cond   ::= testfalse expr_pjif _come_froms
+
+        # FIXME: Investigate - We don't do the below because these rules prevent the "and_cond" from
+        #        trigering.
+        # and      ::= and_parts expr
         # and      ::= not expr
 
         nand       ::= and_parts expr_pjit  come_froms
@@ -88,16 +92,20 @@ class Python37LambdaParser(Python37BaseParser):
         #       "nand" and "or_cond", in contrast, *must* have at least one "come_from".
         or_cond     ::= or_parts expr_pjif come_froms
         or_cond1    ::= and POP_JUMP_IF_TRUE come_froms expr_pjif come_from_opt
-        nor_cond    ::= or_parts expr_pjit
+
+        nor_cond    ::= or_parts expr_pjif
 
         # When we alternating and/or's such as:
         #    a and (b or c) and d
-        # instead of POP_JUMP_IF_TRUE, JUMP_IF_FALSE_OR_POP can be used
+        # instead of POP_JUMP_IF_TRUE, JUMP_IF_FALSE_OR_POP is sometimes be used
         # The semantic rules for "and" require expr-like things in positions 0 and 1,
         # thus the use of expr_jifop_cfs below.
 
         expr_jifop_cfs ::= expr JUMP_IF_FALSE_OR_POP _come_froms
         and            ::= expr_jifop_cfs expr _come_froms
+
+        or_and         ::= expr_jitop expr come_from_opt JUMP_IF_FALSE_OR_POP expr _come_froms
+        and_or         ::= expr_jifop expr come_from_opt JUMP_IF_TRUE_OR_POP expr _come_froms
 
         ## A COME_FROM is dropped off because of JUMP-to-JUMP optimization
         # and       ::= expr_pjif expr
@@ -106,8 +114,7 @@ class Python37LambdaParser(Python37BaseParser):
         # and       ::= expr_pjif expr COME_FROM
 
         jump_if_false_cf ::= POP_JUMP_IF_FALSE COME_FROM
-
-        and_or_cond ::= and_parts expr POP_JUMP_IF_TRUE come_froms expr_pjif _come_froms
+        and_or_cond      ::= and_parts expr POP_JUMP_IF_TRUE come_froms expr_pjif _come_froms
 
         # For "or", keep index 0 and 1 be the two expressions.
 
@@ -132,7 +139,7 @@ class Python37LambdaParser(Python37BaseParser):
         or_expr   ::= expr JUMP_IF_TRUE expr COME_FROM
 
         jitop_come_from_expr ::= JUMP_IF_TRUE_OR_POP _come_froms expr
-        or                   ::= and jitop_come_from_expr COME_FROM
+        and_or_expr  ::= and_parts expr jitop_come_from_expr COME_FROM
         """
 
     def p_come_froms(self, args):
@@ -272,6 +279,9 @@ class Python37LambdaParser(Python37BaseParser):
         expr ::= LOAD_NAME
         expr ::= LOAD_STR
         expr ::= and
+        expr ::= or_and
+        expr ::= and_or
+        expr ::= and_or_expr
         expr ::= bin_op
         expr ::= call
         expr ::= compare
@@ -368,6 +378,7 @@ class Python37LambdaParser(Python37BaseParser):
         expr_pjif                  ::= expr POP_JUMP_IF_FALSE
         expr_pjit                  ::= expr POP_JUMP_IF_TRUE
         expr_pjitt                 ::= expr pjump_ift
+        expr_jifop                 ::= expr JUMP_IF_FALSE_OR_POP
         expr_jitop                 ::= expr JUMP_IF_TRUE_OR_POP
         expr_pjiff                 ::= expr pjump_iff
         expr_pjift                 ::= expr pjump_ift

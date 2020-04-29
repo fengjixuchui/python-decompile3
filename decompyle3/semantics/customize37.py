@@ -17,7 +17,7 @@
 
 import re
 from spark_parser.ast import GenericASTTraversalPruningException
-from xdis.code import iscode
+from xdis import iscode
 from xdis.util import co_flags_is_async
 from decompyle3.scanners.tok import Token
 from decompyle3.semantics.consts import (
@@ -55,10 +55,30 @@ def customize_for_version37(self, version):
 
     TABLE_DIRECT.update(
         {
+            "and_or_expr":  (
+                "%c and %c or %c",
+                (0, "and_parts"),
+                (1, "expr"),
+                (2, "jitop_come_from_expr"),
+                ),
+            "or_and":          	(
+                "%c or (%c and %c)",
+                (0,  "expr_jitop"),
+                (1,  "expr"),
+                (4,  "expr")
+            ),
+
+            "and_or":          	(
+                "%c and (%c or %c)",
+                (0,  "expr_jifop"),
+                (1,  "expr"),
+                (4,  "expr")
+            ),
+
             "and_not":  ("%c and not %c", (0, "expr_pjif"), (1, "expr_pjit")),
             "and_cond": (
                 "%c and %c",
-                (0, "and_parts"),
+                (0, ("and_parts", "testfalse")),
                 (1, ("expr_pjif", "expr")),
             ),
             "ann_assign": ("%|%[2]{attr}: %c\n", 0,),
@@ -88,6 +108,7 @@ def customize_for_version37(self, version):
                 (17, "for_block"),
             ),
             "async_with_stmt": ("%|async with %c:\n%+%c%-", (0, "expr"), 3),
+            "c_async_with_stmt": ("%|async with %c:\n%+%c%-", (0, "expr"), 3),
             "async_with_as_stmt": (
                 "%|async with %c as %c:\n%+%c%-",
                 (0, "expr"),
@@ -223,6 +244,12 @@ def customize_for_version37(self, version):
                 (1, "expr_pjif"),
             ),
 
+            "nor_cond": (
+                "%c or %c",
+                (0, ("or_parts", "and")),
+                (1, "expr_pjif"),
+            ),
+
             "or_cond1": (
                 "%c or %c",
                 (0, ("or_parts", "and")),
@@ -249,7 +276,7 @@ def customize_for_version37(self, version):
             ),
 
             "and_parts": (
-                "%c and %c", (0, ("and_parts", "expr_pjif")), (1, "expr_pjif"),
+                "%P and %c", (0, -1, "and ", PRECEDENCE["and"]), (1, "expr_pjif"),
             ),
             "nand": (
                 "not (%c and %c)",
@@ -262,7 +289,7 @@ def customize_for_version37(self, version):
             ),
 
             "or_parts": (
-                "%c or %c", (0, "or_parts", "expr_pjit"), (1, "expr_pjit"),
+                "%P or %c", (0, -1, "or ", PRECEDENCE["or"]), (1, "expr_pjif"),
             ),
 
             "testfalsec": (
@@ -525,7 +552,11 @@ def customize_for_version37(self, version):
             and opname == "CALL_FUNCTION_1"
             or not re.match(r"\d", opname[-1])
         ):
-            self.template_engine(("%c(%c)", (0, "expr"), 1), node)
+            self.template_engine(
+                ("%c(%p)",
+                 (0, "expr"),
+                 (1, PRECEDENCE["yield"]-1)),
+                node)
             self.prec = p
             self.prune()
         else:

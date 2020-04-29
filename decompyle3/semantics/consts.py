@@ -18,7 +18,7 @@ import re, sys
 from decompyle3.parsers.treenode import SyntaxTree
 from decompyle3.scanners.tok import Token, NoneToken
 
-minint = -sys.maxsize-1
+minint = -sys.maxsize - 1
 maxint = sys.maxsize
 
 # Operator precidence See
@@ -47,6 +47,7 @@ PRECEDENCE = {
     "yield":                  38, # Needs to be below named_expr
     "yield_from":             38,
 
+    "_mklambda":              30,
     "mklambda":               30,
 
     "if_exp":                 28, # IfExp ( a if x else b)

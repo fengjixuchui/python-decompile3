@@ -33,7 +33,7 @@ from typing import Any, Callable
 import sys
 from collections import deque
 
-from xdis.code import iscode
+from xdis import iscode
 from xdis.load import check_object_path, load_module
 from decompyle3.scanner import get_scanner
 
@@ -99,7 +99,7 @@ def disassemble_file(filename: str, outstream=None) -> None:
     try to find the corresponding compiled object.
     """
     filename = check_object_path(filename)
-    (version, timestamp, magic_int, co, is_pypy, source_size) = load_module(filename)
+    (version, timestamp, magic_int, co, is_pypy, source_size, sip_hash) = load_module(filename)
     if type(co) == list:
         for con in co:
             disco(version, con, outstream)
