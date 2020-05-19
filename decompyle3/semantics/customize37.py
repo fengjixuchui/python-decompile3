@@ -17,8 +17,7 @@
 
 import re
 from spark_parser.ast import GenericASTTraversalPruningException
-from xdis import iscode
-from xdis.util import co_flags_is_async
+from xdis import co_flags_is_async, iscode
 from decompyle3.scanners.tok import Token
 from decompyle3.semantics.consts import (
     PRECEDENCE,
@@ -261,6 +260,11 @@ def customize_for_version37(self, version):
                 (0, ("and_parts", "or_parts")),
                 (1, "expr"),
                 (4, "expr_pjif"),
+            ),
+
+            "list_afor": (
+                " async for %[1]{%c} in %c%[1]{%c}",
+                (1, "store"), (0, "get_aiter"), (3, "list_iter"),
             ),
 
             "list_if37": (" if %p%c", (0, 27), 1),
