@@ -85,10 +85,19 @@ class TreeTransform(GenericASTTraversal, object):
 
         code = find_code_node(node, -3).attr
 
+        mkfunc_pattr = node[-1].pattr
+        if isinstance(mkfunc_pattr, tuple):
+            assert isinstance(mkfunc_pattr, tuple)
+            assert len(mkfunc_pattr, 4) and isinstance(mkfunc_pattr, int)
+            is_closure = node[-1].pattr[3] != 0
+        else:
+            # FIXME: This is what we had before. It is hoaky and probably wrong.
+            is_closure = mkfunc_pattr == "closure"
+
         if (
-            node[-1].pattr != "closure"
+            (not is_closure)
             and len(code.co_consts) > 0
-            and code.co_consts[0] is not None
+            and isinstance(code.co_consts[0], str)
         ):
             docstring_node = SyntaxTree(
                 "docstring",
@@ -380,6 +389,12 @@ class TreeTransform(GenericASTTraversal, object):
             list_for_node.transformed_by = ("n_list_for",)
         return list_for_node
 
+    def n_negated_testtrue(self, node):
+        assert node[0] == "testtrue"
+        test_node = node[0][0]
+        test_node.transformed_by = "n_negated_testtrue"
+        return test_node
+
     def n_stmts(self, node):
         if node.first_child() == "SETUP_ANNOTATIONS":
             prev = node[0]
@@ -432,6 +447,7 @@ class TreeTransform(GenericASTTraversal, object):
 
             for i in range(n):
                 if is_docstring(self.ast[i]):
+                    load_const = self.ast[i].first_child()
                     docstring_ast = SyntaxTree(
                         "docstring",
                         [
@@ -439,8 +455,8 @@ class TreeTransform(GenericASTTraversal, object):
                                 "LOAD_STR",
                                 has_arg=True,
                                 offset=0,
-                                attr=self.ast[i][0][0].attr,
-                                pattr=self.ast[i][0][0].pattr,
+                                attr=load_const.attr,
+                                pattr=load_const.pattr,
                             )
                         ],
                         transformed_by="transform",
